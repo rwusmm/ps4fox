@@ -27,7 +27,10 @@ public:
     bool load_image(const std::string& image_path);
 
     // Render the HTML content to the surface buffer
-    void render(uint8_t* framebuffer, int fb_width, int fb_height);
+    void render(uint8_t* framebuffer, int fb_width, int fb_height, const litehtml::rect* clip_rect = nullptr);
+
+    // Resize the renderer
+    void resize(int width, int height);
 
     // Get the rendered width/height
     int get_width() const { return m_width; }

@@ -6,7 +6,7 @@
 #include "orbisfox/rust_runtime.h"
 #include "orbisfox/stick_cursor.h"
 #include "orbisfox/js_canvas.h"
-#include "ps4_browser/litehtml_wrapper.h"
+#include "litehtml_wrapper.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

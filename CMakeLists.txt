@@ -35,6 +35,7 @@ set(PS4_SOURCES
 # Set header files
 set(PS4_HEADERS
     src/ps4/litehtml_wrapper.h
+    include/
     src/include/
 )
 
@@ -43,6 +44,7 @@ add_executable(PS4b ${PS4_SOURCES} ${PS4_HEADERS})
 
 # Include directories
 target_include_directories(PS4b PUBLIC
+    include
     src
     src/include
     tp/litehtml/include
