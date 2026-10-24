@@ -2,7 +2,7 @@
 #include "orbisfox/jit_memory_probe.h"
 #include "orbisfox/module_binding.h"
 #include "orbisfox/presenter.h"
-#include "../../gecko/orbisfox/OrbisExecutableMemory.h"
+#include "ExecutableMemory.h"
 #include <orbis/libkernel.h>
 #include <sys/mman.h>
 #include <unistd.h>

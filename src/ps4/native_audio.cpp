@@ -1,9 +1,22 @@
 #include "orbisfox/native_audio.h"
 #include "orbisfox/module_binding.h"
-#include "../../gecko/orbisfox/OrbisAudioBackend.h"
+#include "AudioBackend.h"
 #include <orbis/AudioOut.h>
 #include <orbis/Sysmodule.h>
 #include <stdio.h>
+
+namespace ps4_browser {
+static AudioBackend g_active_audio_backend{};
+
+void set_audio_backend(const AudioBackend& backend) {
+    g_active_audio_backend = backend;
+}
+
+bool audio_backend_ready() {
+    return g_active_audio_backend.open != nullptr;
+}
+}
+
 namespace orbisfox {
 namespace {
 ModuleBinding module;
@@ -14,8 +27,9 @@ struct Functions {
  decltype(&::sceAudioOutClose) close=nullptr;
 } functions;
 }
+
 bool prepare_native_audio(){
- set_orbis_audio_backend({});
+ ps4_browser::set_audio_backend({});
  if(!module.open(ps4_module_backend(),"libSceAudioOut",ORBIS_SYSMODULE_INTERNAL_AUDIOOUT)
     || !module.bind("sceAudioOutInit",functions.init)
     || !module.bind("sceAudioOutOpen",functions.open)
@@ -23,7 +37,7 @@ bool prepare_native_audio(){
     || !module.bind("sceAudioOutClose",functions.close))return false;
  const int32_t initialized=functions.init();
  if(initialized){printf("AudioOut init failed rc=0x%x\n",unsigned(initialized));return false;}
- OrbisAudioBackend backend{&functions,
+ ps4_browser::AudioBackend backend{&functions,
   [](void* user)->int32_t {auto& f=*static_cast<Functions*>(user);return f.open(ORBIS_USER_SERVICE_USER_ID_SYSTEM,ORBIS_AUDIO_OUT_PORT_TYPE_MAIN,0,256,48000,ORBIS_AUDIO_OUT_PARAM_FORMAT_S16_STEREO);},
   [](void* user,int32_t port,const int16_t* pcm)->int32_t {return static_cast<Functions*>(user)->output(port,pcm);},
   [](void* user,int32_t port)->int32_t {return static_cast<Functions*>(user)->close(port);}};
@@ -36,6 +50,6 @@ bool prepare_native_audio(){
  const int32_t waited=sent<0?sent:backend.output(backend.user,port,nullptr);
  if(backend.close(backend.user,port)!=0)__builtin_trap();
  if(sent<0||waited<0){printf("AudioOut default silence probe failed send=0x%x wait=0x%x\n",unsigned(sent),unsigned(waited));return false;}
- set_orbis_audio_backend(backend);return true;
+ ps4_browser::set_audio_backend(backend);return true;
 }
 }
