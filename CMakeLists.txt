@@ -58,18 +58,18 @@ set(PS4_HEADERS
     src/include/
 )
 
-# Create the executable
-add_executable(ps4fox ${PS4_SOURCES} ${PS4_HEADERS})
+# Create the PS4b executable (the PS4 Browser target)
+add_executable(PS4b ${PS4_SOURCES} ${PS4_HEADERS})
 
 # Include directories
-target_include_directories(ps4fox PUBLIC
+target_include_directories(PS4b PUBLIC
     src
     src/include
     tp/litehtml/include
 )
 
 # Link against litehtml
-target_link_libraries(ps4fox PRIVATE litehtml)
+target_link_libraries(PS4b PRIVATE litehtml)
 
-# Set output name
-set_target_properties(ps4fox PROPERTIES OUTPUT_NAME "ps4fox")
+# Set output name to PS4b (matching the expected build/PS4b.self)
+set_target_properties(PS4b PROPERTIES OUTPUT_NAME "PS4b")
