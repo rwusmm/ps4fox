@@ -1,0 +1,39 @@
+name: PS4b Browser Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-ps4b:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git cmake
+
+      - name: Configure build
+        run: |
+          cmake -B build -S .
+
+      - name: Build PS4b
+        run: |
+          cmake --build build --target PS4b
+
+      - name: Package PS4b
+        run: |
+          mkdir -p pkg
+          ps4-packager build/PS4b.self pkg/PS4b.pkg
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ps4b-pkg
+          path: pkg/PS4b.pkg
