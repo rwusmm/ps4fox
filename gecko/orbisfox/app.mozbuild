@@ -1,3 +1,0 @@
-# Build the real Gecko core; do not pull in the Firefox browser frontend.
-include("/toolkit/toolkit.mozbuild")
-DIRS += ["/orbisfox/branding"]
