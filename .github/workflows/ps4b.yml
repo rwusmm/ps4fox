@@ -10,6 +10,8 @@ on:
 jobs:
   build-ps4b:
     runs-on: ubuntu-latest
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 3
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -25,7 +27,7 @@ jobs:
 
       - name: Build PS4b
         run: |
-          cmake --build build --target PS4b
+          cmake --build build --target PS4b -j 3
 
       - name: Package PS4b
         run: |
