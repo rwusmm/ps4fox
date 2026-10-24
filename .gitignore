@@ -1,0 +1,8 @@
+# PS4 Browser - Ignore build artifacts and toolchain
+build/
+*.artifact
+*.tar.gz
+*.zip
+
+# ORBIS Toolchain
+tp/openorbis/

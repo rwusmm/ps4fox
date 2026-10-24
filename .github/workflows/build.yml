@@ -16,9 +16,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up ORBIS SDK
-        uses: uxcn/action-orbis-sdk@v1
-        with:
-          orbis-sdk-version: latest
+        run: |
+          git clone https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain.git tp/openorbis
+          echo "::add-path::$(pwd)/tp/openorbis/bin"
 
       - name: Install dependencies
         run: |
