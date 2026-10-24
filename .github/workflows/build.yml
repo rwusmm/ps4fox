@@ -38,9 +38,4 @@ jobs:
           path: ps4/*
           retention-days: 30
 
-      - name: Notify Discord
-        if: always()
-        uses: JasonETaylor/discord-webhook-action@v1
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          message: "PS4 Browser build ${{ job.status }} on ${{ runner.os }}"
+      
