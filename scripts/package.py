@@ -13,13 +13,13 @@ from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parent.parent
 TITLE_ID = 'ORBF00001'
-CONTENT_ID = f'IV0000-{TITLE_ID}_00-ORBISFOXPROBE000'
+CONTENT_ID = f'IV0000-{TITLE_ID}_00-PS4FOXPROBE000'
 VERSION = '0.11'
-APP_TITLE = 'OrbisFox'
-PACKAGE_NAME = 'OrbisFox.pkg'
+APP_TITLE = 'PS4Fox'
+PACKAGE_NAME = 'ps4fox.pkg'
 SWGL_REVISION = '83cebcf5a522bf49667fd07084f04e8497de0eba'
 VIDEOOUT_TITLE_ID = 'ORBV00001'
-VIDEOOUT_CONTENT_ID = f'IV0000-{VIDEOOUT_TITLE_ID}_00-ORBISFOXVIDEO000'
+VIDEOOUT_CONTENT_ID = f'IV0000-{VIDEOOUT_TITLE_ID}_00-PS4FOXVIDEO000'
 # Composite/Piglet application capabilities, as used by OpenOrbis' Piglet sample.
 # This is broader than a production browser should need; review before release.
 AUTHINFO = '000000000000000000000000001C004000FF000000000080000000000000000000000000000000000000008000400040000000000000008000000000000000080040FFFF000000F000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
@@ -234,7 +234,7 @@ def main():
     if artifact != built:
         built.replace(artifact)
     run('PkgTool.Core', 'pkg_validate', artifact)
-    shutil.copy2(build / 'orbisfox.elf', dist / ('orbisfox-videoout.elf' if videoout else 'orbisfox.elf'))
+    shutil.copy2(build / 'orbisfox.elf', dist / ('orbisfox-videoout.elf' if videoout else PACKAGE_NAME.replace('.pkg', '.elf')))
     report = {
         'title': title,
         'version': VERSION,

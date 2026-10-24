@@ -11,16 +11,16 @@ def package_identity(mesa=False, sdk='openorbis'):
     if sdk == 'homebrew':
         if mesa:
             raise ValueError('Native SDK Mesa packaging is not implemented')
-        return {'title': 'OrbisFox SDK Test', 'title_id': 'ORHB00001',
-                'content_id': 'IV0000-ORHB00001_00-ORBISFOXPROBE000',
-                'package_name': 'OrbisFox-Homebrew.pkg',
+        return {'title': 'PS4Fox SDK Test', 'title_id': 'ORHB00001',
+                'content_id': 'IV0000-ORHB00001_00-PS4FOXPROBE000',
+                'package_name': 'ps4fox.pkg',
                 'profile': '/data/orbisfox/homebrew-profile'}
     title_id = 'ORME00001' if mesa else 'ORBF00001'
-    return {'title': 'OrbisFox Mesa Test' if mesa else 'OrbisFox',
+    return {'title': 'PS4Fox Mesa Test' if mesa else 'PS4Fox',
             'title_id': title_id,
-            'content_id': f'IV0000-{title_id}_00-ORBISFOXPROBE000',
-            'package_name': 'OrbisFox-Mesa.pkg' if mesa else 'OrbisFox.pkg',
-            'profile': '/data/orbisfox/mesa-profile' if mesa else '/data/orbisfox/gecko-profile'}
+            'content_id': f'IV0000-{title_id}_00-PS4FOXPROBE000',
+            'package_name': 'ps4fox.pkg' if mesa else 'ps4fox.pkg',
+            'profile': '/data/orbisfox/mesa-profile' if mesa else '/data/orbisfox/ps4fox-profile'}
 
 
 def report_identity(report):

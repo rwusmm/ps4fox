@@ -1,4 +1,4 @@
-# Contributing to OrbisFox
+# Contributing to PS4Fox
 
 Thanks for helping an early native browser port become useful. This is an
 experimental alpha, not desktop Firefox with a different build switch. Read the limitations
@@ -35,7 +35,7 @@ The producers build the selected prerequisites before the full engine. Omit
 `--portable-baseline` to use the generic interpreter; neither interpreter enables
 native JIT. Some tests still use the standalone `build/gecko-spidermonkey/` lane.
 `make pkg` is the historical standalone app, **not** the browser. A missing
-historical `dist/OrbisFox.pkg` is acceptable; an existing one is protected.
+historical `dist/PS4Fox.pkg` is acceptable; an existing one is protected.
 
 Useful focused stages after initial setup:
 

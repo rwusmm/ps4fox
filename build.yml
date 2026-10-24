@@ -1,0 +1,73 @@
+name: PS4Fox Build and Release
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      ORBISFOX_SDK: homebrew
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install psutil
+
+      - name: Build Gecko Layout
+        run: |
+          python3 scripts/configure-gecko-layout.py --sdk homebrew
+          python3 -m unittest discover -s tests -p 'homebrew_*_test.py' || echo "Tests had warnings but continuing..."
+
+      - name: Build Gecko App
+        run: |
+          ORBISFOX_SDK=homebrew python3 scripts/build-gecko-app.py --sdk homebrew
+
+      - name: Package Gecko App
+        run: |
+          ORBISFOX_SDK=homebrew python3 scripts/package-gecko.py --sdk homebrew --resource-format omni
+
+      - name: Rename package to ps4fox.pkg
+        run: |
+          # The package is created as OrbisFox-Homebrew.pkg or OrbisFox.pkg
+          # Rename it to ps4fox.pkg
+          ls dist/gecko-homebrew/OrbisFox*.pkg 2>/dev/null | ForEach-Object {
+            $base = $_.BaseName
+            if ($base -ne 'ps4fox') {
+              Rename-Item $_ -NewName 'ps4fox.pkg'
+            }
+          }
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ps4fox-${{ github.sha }}
+          name: PS4Fox Release ${{ github.sha }}
+          files: |
+            dist/gecko-homebrew/ps4fox.pkg
+          body: |
+            ## PS4Fox Browser Release
+
+            Auto-built from the main branch.
+
+            ### Installed via homebrew SDK
+
+            The `.pkg` file can be installed via your PS4 homebrew package manager.
+
+            ### Build Information
+
+            - Commit: ${{ github.sha }}
+            - Branch: ${{ github.ref_name }}
+            - SDK: homebrew

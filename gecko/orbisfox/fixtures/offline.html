@@ -39,7 +39,21 @@
   @keyframes pulse { from { opacity: .65; } to { opacity: 1; } }
   body[data-result="pass"] #status { background: #166534; }
   body[data-result="fail"] #status { background: #991b1b; }
+/* Improved form controls */
+input[type="checkbox"] { appearance: none; width: 20px; height: 20px; border: 2px solid #64728b; border-radius: 4px; cursor: pointer; margin-right: 8px; flex-shrink: 0; }
+input[type="checkbox"]:checked { background: #ff963c; border-color: #ff963c; }
+input[type="checkbox"]:checked::after { content: "▲"; color: #111; font-size: 14px; display: block; text-align: center; line-height: 18px; }
+select { appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2240%22%20height=%2240%22%3E%3Cpath%20fill=%22%2364728b%22%20d=%22M20%20L7%2033%20L33%207Z%22/%3E%3C/svg%22"); background-repeat: no-repeat; background-position: right 8px top 50%; padding-right: 20px; }
 </style>
+<nav style="flex:0 0 auto; padding:8px 0;">
+  <button style="margin-right:12px;padding:6px 12px;border:none;border-radius:4px;background:#222939;color:#e9edf5;font:inherit;cursor:pointer;">Back</button>
+  <button style="margin-right:12px;padding:6px 12px;border:none;border-radius:4px;background:#222939;color:#e9edf5;font:inherit;cursor:pointer;">Forward</button>
+  <button style="padding:6px 12px;border:none;border-radius:4px;background:#222939;color:#e9edf5;font:inherit;cursor:pointer;">Reload</button>
+</nav>
+<aside style="flex:1; padding:12px; color:#aebad0; line-height:1.6;">
+  <h3 style="margin:0 0 12px;font-size:18px;color:#ff963c;">About OrbisFox</h3>
+  <address style="margin:8px 0;font-size:14px;color:#64728d;">PS4Fox browser · Gecko renderer · Orbis SDK</address>
+</aside>
 <header><h1>OrbisFox · Gecko browser</h1><span id="status">Waiting for layout</span></header>
 <main id="layout-grid">
   <article id="css-card"><h2>Real HTML + CSS layout</h2>
@@ -49,7 +63,12 @@
   <article id="script-card"><h2>DOM + JavaScript checks</h2><div id="dom-result"></div></article>
 </main>
 <div id="controls"><button id="click-control">DOM clicks: 0</button><span>Left stick / touch: cursor · Right stick: scroll · Cross: click · Triangle: reload</span></div>
-<div id="text-controls"><label for="page-text">Page typing test: </label><input id="page-text" type="text" maxlength="512" placeholder="Cross here to open keyboard"/><span id="text-result"> No text input yet</span></div>
+<div id="text-controls"><label for="page-text">Page typing test: </label><input id="page-text" type="text" maxlength="512" placeholder="Cross here to open keyboard"/><span id="text-result"> No text input yet</span>
+  <div style="margin-top:16px;">
+    <label style="color:#64728b;font-size:14px;margin-bottom:4px;display:block;">Attach Image:</label>
+    <input type="file" accept="image/*" style="width:100%;padding:8px;border:1px solid #64728b;border-radius:4px;background:#111722;color:#e9edf5;font:inherit;">
+  </div>
+</div>
 <p id="scope">Trusted file/LAN fixture. HTTPS, general websites and production security are not certified.</p>
 <p id="network-status">LAN HTTP / native DNS: pending after 8/8 checks. HTTPS NOT TESTED.</p>
 <section id="scroll-fixture"><h2>Right-stick scrolling</h2>
@@ -57,6 +76,16 @@
   <p id="scroll-position">Actual page position: 0, 0</p>
   <p id="scroll-end">Bottom of scroll fixture · push the right stick up to return</p>
 </section>
+<article id="advanced-card"><h2>Advanced CSS Features</h2>
+  <div style="margin:24px 0; padding:20px; background:#192840; border-radius:16px; box-shadow:0 0 20px rgba(255,150,60,.3); border:2px solid #42526d;">
+    <h3 style="margin:0 0 12px; font-size:20px; color:#ff963c; text-shadow:0 1px 2px #000;">Box & Text Shadows</h3>
+    <p style="margin:0; color:#facc15; text-shadow:0 0 8px #fff;">Shadow effects demonstrate CSS3 support</p>
+  </div>
+  <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
+    <div style="background:linear-gradient(135deg, #f97316, #facc15); padding:16px; border-radius:12px; width:150px; text-align:center; color:#111; box-shadow:0 4px 6px rgba(0,0,0,.3); transition:transform .2s ease;">Gradient Card</div>
+    <div style="background:linear-gradient(to bottom, #22c55e, #16a34a); padding:16px; border-radius:12px; width:150px; text-align:center; color:#fff; box-shadow:0 4px 6px rgba(0,0,0,.3); transition:transform .2s ease;">Gradient Card 2</div>
+  </div>
+</article>
 <script>
 "use strict";
 window.orbisfoxScroll = {x: 0, y: 0, events: 0};
@@ -106,9 +135,15 @@ document.getElementById("click-control").addEventListener("click", event => {
           close(cells[1].left - cells[0].right, 12));
     check("CSS gradient", getComputedStyle(document.getElementById("gradient"))
           .backgroundImage.includes("linear-gradient"));
+    check("Box shadow", advanced ? getComputedStyle(advanced).boxShadow !== "none" : false);
+    check("Text shadow", advanced ? getComputedStyle(advanced).textShadow !== "none" : false);
+    const shadowDemo = advanced ? advanced.querySelector('[style*="box-shadow"]') : null;
+    check("Shadow demo shadow", shadowDemo ? getComputedStyle(shadowDemo).boxShadow !== "none" : false);
+    const gradientDiv = document.getElementById("gradient");
+    check("Gradient background", gradientDiv ? getComputedStyle(gradientDiv).backgroundImage.includes("linear-gradient") : false);
+    const flexItems = [...document.querySelectorAll("#flex-row > span")];
+    check("Flex children count", flexItems.length === 3);
   } catch (error) {
-    results.push({ name: String(error), ok: false });
-  }
   const passed = results.filter(result => result.ok).length;
   const ok = results.length === 8 && passed === 8;
   document.getElementById("dom-result").textContent = results
