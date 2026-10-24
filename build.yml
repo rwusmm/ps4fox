@@ -1,0 +1,114 @@
+# PS4b Browser Build Script
+# Automatically builds the .pkg for PS4b browser using LiteHTML
+
+# Project name
+PROJECT = PS4b
+
+# Source files - keep existing ps4 folder structure
+PS4_SRC_DIR = src/ps4
+
+# LiteHTML source (assumed in deps/litehtml or system)
+LITEHTML_INCLUDE = -Ilitehtml/include
+LITEHTML_LIB = -Llitehtml/lib -llitehtml
+
+# Compiler flags for PS4
+CC = spu-gcc
+CXX = spu-g++
+CFLAGS = -O2 -Wall -mavx -mfpmath=sse
+CXXFLAGS = -O2 -Wall -mavx -mfpmath=sse
+
+# Additional include paths
+INCLUDES = -I$(PS4_SRC_DIR) $(LITEHTML_INCLUDE)
+
+# Source files - PS4 folder (original OrbisFox code)
+PS4_SOURCES = \
+    $(PS4_SRC_DIR)/main.cpp \
+    $(PS4_SRC_DIR)/ps4/main.cpp \
+    $(PS4_SRC_DIR)/ps4/services.cpp \
+    $(PS4_SRC_DIR)/ps4/controller.cpp \
+    $(PS4_SRC_DIR)/ps4/modules.cpp \
+    $(PS4_SRC_DIR)/ps4/startup.cpp \
+    $(PS4_SRC_DIR)/ps4/videoout.cpp \
+    $(PS4_SRC_DIR)/ps4/surface.cpp \
+    $(PS4_SRC_DIR)/swgl_canvas.cpp \
+    $(PS4_SRC_DIR)/js_canvas.cpp \
+    $(PS4_SRC_DIR)/native_chrome.cpp \
+    $(PS4_SRC_DIR)/artwork.cpp \
+    $(PS4_SRC_DIR)/ui.cpp \
+    $(PS4_SRC_DIR)/touch_cursor.cpp \
+    $(PS4_SRC_DIR)/shader_table.cpp \
+    $(PS4_SRC_DIR)/native_allocator.cpp \
+    $(PS4_SRC_DIR)/native_audio.cpp \
+    $(PS4_SRC_DIR)/native_clock.cpp \
+    $(PS4_SRC_DIR)/native_cpu.cpp \
+    $(PS4_SRC_DIR)/native_fcntl.cpp \
+    $(PS4_SRC_DIR)/native_jit.cpp \
+    $(PS4_SRC_DIR)/native_keyboard.cpp \
+    $(PS4_SRC_DIR)/native_mesa.cpp \
+    $(PS4_SRC_DIR)/native_mesa_probe.cpp \
+    $(PS4_SRC_DIR)/native_network.cpp \
+    $(PS4_SRC_DIR)/native_stat.cpp \
+    $(PS4_SRC_DIR)/native_stdio.cpp \
+    $(PS4_SRC_DIR)/sdk_heap_memory.cpp \
+    $(PS4_SRC_DIR)/rust_runtime.cpp \
+    $(PS4_SRC_DIR)/homebrew_return.cpp
+
+# Additional source files for PS4b browser (LiteHTML + JS integration)
+PS4B_SOURCES = src/PS4b_main.cpp
+
+# LiteHTML source (assumed in deps/litehtml or system)
+LITEHTML_INCLUDE = -Ilitehtml/include
+LITEHTML_LIB = -Llitehtml/lib -llitehtml
+
+# LiteHTML source files (minimal set for browser)
+LITEHTML_SOURCES = \
+    litehtml/element.cpp \
+    litehtml/el_image.cpp \
+    litehtml/el_link.cpp \
+    litehtml/el_para.cpp \
+    litehtml/el_font.cpp \
+    litehtml/render_image.cpp \
+    litehtml/render_table.cpp \
+    litehtml/render_flex.cpp \
+    litehtml/formatting_context.cpp \
+    litehtml/flex_item.cpp
+
+# All source files combined
+SOURCES = $(PS4_SOURCES) $(LITEHTML_SOURCES)
+
+# Output binary
+TARGET = PS4b.self
+
+# Library paths
+LIBRARIES = -lorbis -lSceNet -lScePad -lSceUserService -lSceVideoOut -lSceAudioOut -lSceCommonDialog -lSceImeDialog
+
+# Build rule
+all: $(TARGET)
+
+$(TARGET): $(SOURCES) $(PS4B_SOURCES)
+	@echo "Building PS4b browser..."
+	@echo "Compiling PS4 sources..."
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $(PS4_SOURCES) -o obj/
+	@echo "Compiling PS4b LiteHTML source..."
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c src/PS4b_main.cpp -o obj/PS4b_main.o
+	@echo "Compiling LiteHTML sources..."
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $(LITEHTML_SOURCES) -o litehtml_obj/
+	@echo "Linking $(TARGET)..."
+	$(CXX) -o $(TARGET) obj/*.o obj/PS4b_main.o litehtml_obj/*.o $(LIBRARIES) $(LITEHTML_LIB)
+	@echo "Build complete! $(TARGET) generated."
+
+# Package rule for .pkg
+pkg: $(TARGET)
+	@echo "Creating PS4b .pkg..."
+	@mkdir -p pkg
+	@ps4-packager $(TARGET) pkg/PS4b.pkg
+	@echo "Package created: pkg/PS4b.pkg"
+
+# Clean rule
+clean:
+	@echo "Cleaning build..."
+	@rm -rf obj/ litehtml_obj/ $(TARGET) pkg/
+	@echo "Clean complete."
+
+# Default target
+.PHONY: all clean pkg
