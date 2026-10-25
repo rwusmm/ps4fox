@@ -212,14 +212,15 @@ int main() {
             cursor_y = std::max(0, std::min(height - 1, cursor_y + sy));
 
             // Touchpad cursor motion
-            if (input.touchData.touchNum > 0) {
+            size_t touch_count = input.touch.fingers > 2 ? 2 : input.touch.fingers;
+            if (touch_count > 0) {
                 orbisfox::TouchPoint points[2];
-                for (int i = 0; i < input.touchData.touchNum && i < 2; ++i) {
-                    points[i].x = input.touchData.touch[i].x;
-                    points[i].y = input.touchData.touch[i].y;
-                    points[i].id = input.touchData.touch[i].touchId;
+                for (size_t i = 0; i < touch_count; ++i) {
+                    points[i].x = input.touch.touch[i].x;
+                    points[i].y = input.touch.touch[i].y;
+                    points[i].id = input.touch.touch[i].finger;
                 }
-                touch.update(points, input.touchData.touchNum, width, height, cursor_x, cursor_y);
+                touch.update(points, touch_count, width, height, cursor_x, cursor_y);
             }
         }
 
