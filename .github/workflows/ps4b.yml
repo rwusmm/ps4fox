@@ -29,6 +29,8 @@ jobs:
 
       - name: Configure build
         run: |
+          export CC=clang
+          export CXX=clang++
           cmake -B build -S .
 
       - name: Build PS4b

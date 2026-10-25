@@ -6,10 +6,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # PS4 cross-compilation flags
-set(CMAKE_C_COMPILER clang)
-set(CMAKE_CXX_COMPILER clang++)
-set(CMAKE_LINKER ld.lld)
-
 set(CMAKE_C_FLAGS "--target=x86_64-pc-freebsd12-elf -fPIC -funwind-tables -isysroot ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis -isystem ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/include")
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -isystem ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/include/c++/v1")
 set(CMAKE_EXE_LINKER_FLAGS "-m elf_x86_64 -pie --script ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/link.x --eh-frame-hdr -L${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/lib ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/lib/crt1.o")
