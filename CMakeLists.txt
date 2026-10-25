@@ -56,6 +56,7 @@ target_include_directories(PS4b PUBLIC
 target_link_directories(PS4b PRIVATE
     tp/openorbis/lib
     ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib
 )
 
 # OpenOrbis library stubs required for PS4 system calls
