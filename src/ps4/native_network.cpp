@@ -1,7 +1,7 @@
 #ifdef ORBISFOX_FULL_GECKO
-#include "orbisfox/native_network.h"
-#include "orbisfox/module_binding.h"
-#include "orbisfox/presenter.h"
+#include "ps4b/native_network.h"
+#include "ps4b/module_binding.h"
+#include "ps4b/presenter.h"
 #include <orbis/Sysmodule.h>
 namespace orbisfox {
 bool prepare_native_network() {

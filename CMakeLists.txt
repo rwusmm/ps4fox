@@ -11,20 +11,21 @@ add_subdirectory(tp/litehtml)
 # PS4-specific compile definitions
 add_definitions(-D_PS4)
 
-# Set source files - direct src/ and src/ps4/ subdirectory
+# Set source files - modular browser core and ps4 platform
 set(PS4_SOURCES
     src/artwork.cpp
     src/js_canvas.cpp
-    src/PS4b_main.cpp
+    src/PS4b.cpp
+    src/browser_navigation.cpp
+    src/net/http_client.cpp
     src/surface.cpp
     src/touch_cursor.cpp
     src/ui.cpp
-    src/ps4/litehtml_wrapper.cpp
+    src/ps4/html_renderer.cpp
     src/ps4/modules.cpp
     src/ps4/native_audio.cpp
     src/ps4/piglet.cpp
     src/ps4/platform.cpp
-    src/ps4/ps4_browser_main.cpp
     src/ps4/run_logs.cpp
     src/ps4/rust_runtime.cpp
     src/ps4/services.cpp
@@ -34,7 +35,9 @@ set(PS4_SOURCES
 
 # Set header files
 set(PS4_HEADERS
-    src/ps4/litehtml_wrapper.h
+    src/browser_navigation.h
+    src/net/http_client.h
+    src/ps4/html_renderer.h
     include/
     src/include/
 )
@@ -48,6 +51,7 @@ target_include_directories(PS4b PUBLIC
     src
     src/include
     tp/litehtml/include
+    tp/openorbis/include
 )
 
 # Link against litehtml

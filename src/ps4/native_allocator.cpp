@@ -1,19 +1,19 @@
 #ifdef ORBISFOX_FULL_GECKO
-#include "orbisfox/native_allocator.h"
+#include "ps4b/native_allocator.h"
 #ifndef ORBISFOX_HOMEBREW_SDK
-#include "orbisfox/heap_expand_fallback.h"
+#include "ps4b/heap_expand_fallback.h"
 #include <sys/types.h>
 #ifdef ORBISFOX_NATIVE_DIRECT_HEAP
-#include "orbisfox/sdk_heap_memory.h"
+#include "ps4b/sdk_heap_memory.h"
 extern "C" void* __real___mmap(void*,size_t,int,int,int,off_t);
 #endif
 #ifdef ORBISFOX_NATIVE_RUN_LOGS
-#include "orbisfox/run_logs.h"
+#include "ps4b/run_logs.h"
 #endif
-#include "orbisfox/heap_diagnostics.h"
+#include "ps4b/heap_diagnostics.h"
 #ifdef ORBISFOX_SDK_BIN_AUDIT
-#include "orbisfox/heap_bin_audit.h"
-#include "orbisfox/allocator_flight.h"
+#include "ps4b/heap_bin_audit.h"
+#include "ps4b/allocator_flight.h"
 // SDK-owned state is mutable; only our accessor view is read-only. Declaring
 // the actual global const would give optimizers an invalid immutability promise.
 extern "C" unsigned char orbisfox_sdk_malloc_state[];

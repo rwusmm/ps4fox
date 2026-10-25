@@ -1,6 +1,6 @@
 #ifdef ORBISFOX_FULL_GECKO
-#include "orbisfox/native_fcntl.h"
-#include "orbisfox/presenter.h"
+#include "ps4b/native_fcntl.h"
+#include "ps4b/presenter.h"
 #include <atomic>
 #include <errno.h>
 #include <fcntl.h>
@@ -47,7 +47,7 @@ extern "C" int orbisfox_sqlite_fcntl(int fd, int command, ...) {
 }
 namespace orbisfox {
 bool probe_native_file_locks() {
-    char path[] = "/data/orbisfox/fcntl-native-XXXXXX";
+    char path[] = "/data/ps4b/fcntl-native-XXXXXX";
     const int fd = mkstemp(path);
     if (fd < 0) { log("ERROR: native file-lock probe create errno=%d", errno); return false; }
     struct flock record{}; record.l_type = F_RDLCK;
@@ -168,7 +168,7 @@ bool probe_native_file_locks() {
     if (!bind()) { log("ERROR: native file-lock binding unavailable"); return false; }
     static_assert(F_GETLK == 11 && F_SETLK == 12 && F_SETLKW == 13);
     static_assert(sizeof(struct flock) == 32 && offsetof(struct flock, l_type) == 0);
-    const int fd = open("/data/orbisfox/fcntl-abi-probe.dat", O_CREAT | O_RDWR | O_TRUNC, 0600);
+    const int fd = open("/data/ps4b/fcntl-abi-probe.dat", O_CREAT | O_RDWR | O_TRUNC, 0600);
     if (fd < 0) { log("ERROR: file-lock probe open errno=%d", errno); return false; }
     struct flock sdk{}; sdk.l_type = F_RDLCK; sdk.l_whence = SEEK_SET; sdk.l_len = 1;
     errno = 0;

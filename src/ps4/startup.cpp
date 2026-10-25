@@ -1,7 +1,7 @@
 // Log static initialization before main using only firmware file APIs. No
 // stdio, allocation, TLS, C++ streams, or Gecko calls are required by tracing.
 #include <orbis/libkernel.h>
-#include "orbisfox/run_logs.h"
+#include "ps4b/run_logs.h"
 #include <fcntl.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -47,7 +47,7 @@ extern "C" void orbisfox_startup_dispatch() {
     constexpr char banner[] = "OrbisFox 0.68 static initialization diagnostics\n";
 #endif
 #else
-    const int fd = sceKernelOpen("/data/orbisfox/startup.log", O_WRONLY | O_CREAT | O_TRUNC, 0600);
+    const int fd = sceKernelOpen("/data/ps4b/startup.log", O_WRONLY | O_CREAT | O_TRUNC, 0600);
     constexpr char banner[] = "OrbisFox 0.11 pre-main static initializer trace\n";
 #endif
     write_all(fd, banner, sizeof(banner) - 1);

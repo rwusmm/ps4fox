@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Native SDK main-return boundary only, not a global exit/atexit replacement.
 #if defined(ORBISFOX_FULL_GECKO) && defined(ORBISFOX_HOMEBREW_SDK)
-#include "orbisfox/ps4_services.h"
-#include "orbisfox/presenter.h"
+#include "ps4b/ps4_services.h"
+#include "ps4b/presenter.h"
 #include <time.h>
 #include <orbis/libkernel.h>
 

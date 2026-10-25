@@ -2,8 +2,8 @@
 #if !defined(ORBISFOX_HOMEBREW_SDK)
 #  define _POSIX_C_SOURCE 200809L
 #endif
-#include "orbisfox/rust_runtime.h"
-#include "orbisfox/presenter.h"
+#include "ps4b/rust_runtime.h"
+#include "ps4b/presenter.h"
 #include <stdint.h>
 #include <stddef.h>
 #include <pthread.h>

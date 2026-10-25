@@ -2,8 +2,8 @@
 // Reference: https://github.com/bucanero/apollo-ps4/blob/645bd8fb/source/dialog.c
 // This is a bounded nonblocking OrbisFox implementation, not Apollo's UI loop.
 // No wchar_t conversion: firmware dialog buffers are explicitly UTF-16.
-#include "orbisfox/native_keyboard.h"
-#include "orbisfox/presenter.h"
+#include "ps4b/native_keyboard.h"
+#include "ps4b/presenter.h"
 #include <orbis/Sysmodule.h>
 #include <orbis/libkernel.h>
 #include <stddef.h>

@@ -1,5 +1,5 @@
-#include "orbisfox/run_logs.h"
-#include "orbisfox/allocator_flight.h"
+#include "ps4b/run_logs.h"
+#include "ps4b/allocator_flight.h"
 #include <orbis/libkernel.h>
 #include <fcntl.h>
 #include <stdint.h>
@@ -10,7 +10,7 @@ uint64_t flightCommitted=0,flightFailures=0,flightAttempted=0;
 std::atomic<bool> enabled{false};std::atomic<unsigned long long> generation{0};
 std::atomic_flag busy=ATOMIC_FLAG_INIT;
 struct Lock {Lock(){while(busy.test_and_set(std::memory_order_acquire))__asm__ volatile("pause");}~Lock(){busy.clear(std::memory_order_release);}};
-constexpr char marker[]="/data/orbisfox/diagnostics.enabled";
+constexpr char marker[]="/data/ps4b/diagnostics.enabled";
 bool existsError(int rc){return rc==-17 || (static_cast<uint32_t>(rc)&0xffff)==17;}
 struct Text {
   char bytes[768]{};size_t n=0;bool okay=true;
@@ -33,12 +33,12 @@ void stop(){
 bool begin(){
   stop();
   int rc=sceKernelMkdir("/data/orbisfox",0700);if(rc<0&&!existsError(rc))return false;
-  rc=sceKernelMkdir("/data/orbisfox/runs",0700);if(rc<0&&!existsError(rc))return false;
+  rc=sceKernelMkdir("/data/ps4b/runs",0700);if(rc<0&&!existsError(rc))return false;
   OrbisKernelTimeval wall{};const int clockRc=sceKernelGettimeofday(&wall);
   const uint64_t process=sceKernelGetProcessTime();Text id;bool created=false;
   for(unsigned nonce=0;nonce<64;++nonce){
     id={};id.append("run-");id.hex(static_cast<uint64_t>(wall.tv_sec));id.append("-");id.hex(static_cast<uint64_t>(wall.tv_usec));id.append("-");id.hex(process);id.append("-");id.hex(nonce);
-    Text path;path.append("/data/orbisfox/runs/");path.append(id.bytes);if(!path.okay||path.n>=sizeof(directory))return false;
+    Text path;path.append("/data/ps4b/runs/");path.append(id.bytes);if(!path.okay||path.n>=sizeof(directory))return false;
     rc=sceKernelMkdir(path.bytes,0700);
     if(rc==0){for(size_t i=0;i<=path.n;++i)directory[i]=path.bytes[i];created=true;break;}
     if(!existsError(rc))return false;
@@ -48,8 +48,8 @@ bool begin(){
   metadata.append("\",\"wall_seconds_hex\":\"");metadata.hex(static_cast<uint64_t>(wall.tv_sec));metadata.append("\",\"wall_usec_hex\":\"");metadata.hex(static_cast<uint64_t>(wall.tv_usec));
   metadata.append("\",\"process_usec_hex\":\"");metadata.hex(process);metadata.append("\",\"native_clock_ok\":");metadata.append(clockRc==0?"true":"false");metadata.append("}\n");
   char path[256];if(!orbisfox::make_run_log_path(path,sizeof(path),directory,"run-meta.json")||!metadata.okay||!save(path,metadata.bytes,metadata.n,true))return false;
-  id.append("\n");if(!save("/data/orbisfox/run-id.next",id.bytes,id.n,false))return false;
-  if(sceKernelRename("/data/orbisfox/run-id.next","/data/orbisfox/run-id.txt")<0)return false;
+  id.append("\n");if(!save("/data/ps4b/run-id.next",id.bytes,id.n,false))return false;
+  if(sceKernelRename("/data/ps4b/run-id.next","/data/ps4b/run-id.txt")<0)return false;
   if(!orbisfox::make_run_log_path(path,sizeof(path),directory,"heap-audit.log"))return false;
   heapAuditFD=sceKernelOpen(path,O_WRONLY|O_CREAT|O_EXCL,0600);if(heapAuditFD<0)return false;
   enabled.store(true);++generation;return true;
@@ -122,11 +122,11 @@ bool set_native_diagnostics_enabled(bool value){
   Lock lock;if(value==enabled.load())return true;
   if(!value){
     // Persist OFF before reporting success. Do not touch other markers/profile.
-    if(!save("/data/orbisfox/diagnostics.next","0\n",2,false)||sceKernelRename("/data/orbisfox/diagnostics.next",marker)<0)return false;
+    if(!save("/data/ps4b/diagnostics.next","0\n",2,false)||sceKernelRename("/data/ps4b/diagnostics.next",marker)<0)return false;
     stop();return true;
   }
   if(!begin())return false;
-  if(!save("/data/orbisfox/diagnostics.next","1\n",2,false)||sceKernelRename("/data/orbisfox/diagnostics.next",marker)<0){stop();return false;}
+  if(!save("/data/ps4b/diagnostics.next","1\n",2,false)||sceKernelRename("/data/ps4b/diagnostics.next",marker)<0){stop();return false;}
   return true;
 }
 }

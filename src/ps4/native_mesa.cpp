@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
-#include "orbisfox/mesa_binding.h"
-#include "orbisfox/mesa_threading.h"
-#include "orbisfox/module_binding.h"
-#include "orbisfox/native_allocator.h"
-#include "orbisfox/presenter.h"
+#include "ps4b/mesa_binding.h"
+#include "ps4b/mesa_threading.h"
+#include "ps4b/module_binding.h"
+#include "ps4b/native_allocator.h"
+#include "ps4b/presenter.h"
 #include <orbis/libkernel.h>
 #include <stdlib.h>
 #include <string.h>

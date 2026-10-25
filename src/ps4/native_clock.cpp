@@ -1,5 +1,5 @@
 #ifdef ORBISFOX_FULL_GECKO
-#include "orbisfox/native_clock.h"
+#include "ps4b/native_clock.h"
 #include <atomic>
 #include <errno.h>
 #include <stdint.h>

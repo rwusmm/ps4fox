@@ -1,7 +1,7 @@
-#include "orbisfox/native_ui_loop.h"
-#include "orbisfox/pointer_motion.h"
-#include "orbisfox/stick_cursor.h"
-#include "orbisfox/browser_controls.h"
+#include "ps4b/native_ui_loop.h"
+#include "ps4b/pointer_motion.h"
+#include "ps4b/stick_cursor.h"
+#include "ps4b/browser_controls.h"
 #include <stdlib.h>
 #include <string.h>
 namespace orbisfox {

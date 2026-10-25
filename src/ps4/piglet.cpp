@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // OpenOrbis sample-derived integration; see LICENSES/README.md.
-#include "orbisfox/presenter.h"
-#include "orbisfox/shader_table.h"
+#include "ps4b/presenter.h"
+#include "ps4b/shader_table.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

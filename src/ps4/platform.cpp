@@ -1,6 +1,6 @@
-#include "orbisfox/presenter.h"
-#include "orbisfox/run_logs.h"
-#include "orbisfox/pthread_attribute_probe.h"
+#include "ps4b/presenter.h"
+#include "ps4b/run_logs.h"
+#include "ps4b/pthread_attribute_probe.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
@@ -49,8 +49,8 @@ Diagnostics run_platform_probes(bool videoout_only) {
 #ifdef ORBISFOX_FULL_GECKO
         if(native_diagnostics_enabled()){logfile = fopen(NativeRunLogPath("platform-layout.log").c_str(), "a");logGeneration=native_diagnostics_generation();}
 #else
-        logfile = fopen(videoout_only ? "/data/orbisfox/platform-videoout.log"
-                                      : "/data/orbisfox/platform.log", "w");
+        logfile = fopen(videoout_only ? "/data/ps4b/platform-videoout.log"
+                                      : "/data/ps4b/platform.log", "w");
 #endif
         if (logfile) d.storage = "WRITABLE LOG";
     }

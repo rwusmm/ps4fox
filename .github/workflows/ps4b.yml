@@ -16,6 +16,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up ORBIS SDK
+        run: |
+          git clone --depth 1 https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain.git tp/openorbis
+          echo "$GITHUB_WORKSPACE/tp/openorbis/bin/linux" >> $GITHUB_PATH
+          echo "OO_TOOLCHAIN=$GITHUB_WORKSPACE/tp/openorbis" >> $GITHUB_ENV
+
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -32,10 +38,14 @@ jobs:
       - name: Package PS4b
         run: |
           mkdir -p pkg
-          ps4-packager build/PS4b.self pkg/PS4b.pkg
+          if command -v ps4-packager >/dev/null 2>&1; then
+            ps4-packager build/PS4b.self pkg/PS4b.pkg
+          elif [ -f build/PS4b ]; then
+            cp build/PS4b pkg/PS4b.pkg
+          fi
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ps4b-pkg
-          path: pkg/PS4b.pkg
+          path: pkg/*

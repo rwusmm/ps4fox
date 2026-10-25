@@ -2,8 +2,8 @@
 // A real GLES operation gate, before XRE/worker creation. No CPU
 // executable-memory allocation, VideoOut ownership, substituted GL
 // implementation, or claimed HW decode.
-#include "orbisfox/mesa_probe.h"
-#include "orbisfox/presenter.h"
+#include "ps4b/mesa_probe.h"
+#include "ps4b/presenter.h"
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 #include <GLES3/gl3.h>

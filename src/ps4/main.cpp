@@ -1,11 +1,11 @@
-#include "orbisfox/presenter.h"
-#include "orbisfox/artwork.h"
-#include "orbisfox/ps4_services.h"
-#include "orbisfox/swgl_canvas.h"
-#include "orbisfox/touch_cursor.h"
-#include "orbisfox/rust_runtime.h"
-#include "orbisfox/stick_cursor.h"
-#include "orbisfox/js_canvas.h"
+#include "ps4b/presenter.h"
+#include "ps4b/artwork.h"
+#include "ps4b/ps4_services.h"
+#include "ps4b/swgl_canvas.h"
+#include "ps4b/touch_cursor.h"
+#include "ps4b/rust_runtime.h"
+#include "ps4b/stick_cursor.h"
+#include "ps4b/js_canvas.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -35,8 +35,8 @@ int main() {
     // 0.03 blocks in Piglet's first eglSwapBuffers on the tested console.
     // Keep the operational VideoOut path as the default, not a blocked input loop.
     Presenter* presenter = &videoout_presenter();
-    bool test_piglet = access("/data/orbisfox/force-piglet", F_OK) == 0
-        && access("/data/orbisfox/force-videoout", F_OK) != 0;
+    bool test_piglet = access("/data/ps4b/force-piglet", F_OK) == 0
+        && access("/data/ps4b/force-videoout", F_OK) != 0;
     if (test_piglet) {
         log("Experimental Piglet requested by marker");
         presenter = &piglet_presenter();
@@ -66,8 +66,8 @@ int main() {
     if (splash_loaded) sceKernelUsleep(900000);
 
     Controller controller;
-    if (access("/data/orbisfox/skip-controller", F_OK) == 0) {
-        log("Controller: skipped by /data/orbisfox/skip-controller marker");
+    if (access("/data/ps4b/skip-controller", F_OK) == 0) {
+        log("Controller: skipped by /data/ps4b/skip-controller marker");
         diagnostics.controller = "DISABLED BY MARKER";
     } else {
         bool connected = controller.init();
@@ -126,7 +126,7 @@ int main() {
                 if (!js_attempted) {
                     js_attempted = true;
                     log("SpiderMonkey: native interpreter initialization begin AFTER controller setup");
-                    if (access("/data/orbisfox/skip-javascript", F_OK) == 0) {
+                    if (access("/data/ps4b/skip-javascript", F_OK) == 0) {
                         log("SpiderMonkey: skipped by diagnostic marker");
                     } else {
                         js_ready = javascript.init(js_log) && javascript.load_demo("/app0/assets/playground.js");
@@ -149,7 +149,7 @@ int main() {
                     text(surface, 40, 40, "SPIDERMONKEY / JAVASCRIPT STARTUP FAILED", 3, {245,145,45,255});
                     text(surface, 40, 110, javascript.error(), 2, {225,233,248,255});
                     text(surface, 40, 180, "CROSS: DIAGNOSTICS   OPTIONS: EXIT", 3, {225,233,248,255});
-                    text(surface, 40, 240, "DETAILS: /DATA/ORBISFOX/PLATFORM.LOG", 2, {157,175,201,255});
+                    text(surface, 40, 240, "DETAILS: /DATA/ps4b/PLATFORM.LOG", 2, {157,175,201,255});
                     if (js_ready) {
                         log("SpiderMonkey: frame error - %s", javascript.error());
                         js_ready = false;

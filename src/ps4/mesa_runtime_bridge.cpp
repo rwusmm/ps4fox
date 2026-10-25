@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Common, real runtime definitions shared by the XUL link gate and final ELF.
 // No module loading, allocator interposition, or fabricated service results.
-#include "orbisfox/mesa_binding.h"
+#include "ps4b/mesa_binding.h"
 #include <unistd.h>
 
 extern "C" {

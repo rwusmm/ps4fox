@@ -1,7 +1,7 @@
 #ifdef ORBISFOX_FULL_GECKO
-#include "orbisfox/jit_memory_probe.h"
-#include "orbisfox/module_binding.h"
-#include "orbisfox/presenter.h"
+#include "ps4b/jit_memory_probe.h"
+#include "ps4b/module_binding.h"
+#include "ps4b/presenter.h"
 #include "ExecutableMemory.h"
 #include <orbis/libkernel.h>
 #include <sys/mman.h>

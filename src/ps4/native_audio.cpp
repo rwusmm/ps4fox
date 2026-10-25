@@ -1,5 +1,5 @@
-#include "orbisfox/native_audio.h"
-#include "orbisfox/module_binding.h"
+#include "ps4b/native_audio.h"
+#include "ps4b/module_binding.h"
 #include "AudioBackend.h"
 #include <orbis/AudioOut.h>
 #include <orbis/Sysmodule.h>
