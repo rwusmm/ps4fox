@@ -185,28 +185,6 @@ bool http_fetch(const char* url, uint8_t** out_data, size_t* out_size) {
         }
         return false;
     }
-        const char* blank_html =
-            "<!DOCTYPE html><html><head><style>"
-            "body { background: #131b2f; color: #e1e9f8; font-family: sans-serif; padding: 24px; }"
-            "h1 { color: #5bc0be; font-size: 32px; border-bottom: 2px solid #3a506b; padding-bottom: 8px; }"
-            "p { font-size: 18px; line-height: 1.6; color: #cbd5e1; }"
-            ".card { background: #1c2541; padding: 16px; border-radius: 8px; border: 1px solid #3a506b; margin-top: 16px; }"
-            "code { background: #0b132b; color: #6fffe9; padding: 2px 6px; border-radius: 4px; }"
-            "</style></head><body>"
-            "<h1>PS4b Web Browser</h1>"
-            "<div class='card'>"
-            "<p>Browser engine online. Enter a URL to browse the web.</p>"
-            "<p>Engine components: <code>LiteHTML Layout</code>, <code>CSS3 Styles</code>, <code>TLS 1.2/1.3</code>, and <code>HTTP/1.1 Client</code>.</p>"
-            "</div></body></html>";
-        size_t len = strlen(blank_html);
-        *out_data = static_cast<uint8_t*>(malloc(len + 1));
-        if (*out_data) {
-            memcpy(*out_data, blank_html, len + 1);
-            *out_size = len;
-            return true;
-        }
-        return false;
-    }
 
 #ifdef _PS4
     if (!g_http_initialized && !net_init()) {
@@ -280,19 +258,19 @@ bool http_fetch(const char* url, uint8_t** out_data, size_t* out_size) {
 
 // Statistics functions
 void net_add_bytes_transferred(size_t bytes) {
-    g_bytes_transferred += bytes;
+    ps4b::g_bytes_transferred += bytes;
 }
 
 size_t net_get_bytes_transferred() {
-    return g_bytes_transferred;
+    return ps4b::g_bytes_transferred;
 }
 
 void net_reset_bytes_transferred() {
-    g_bytes_transferred = 0;
+    ps4b::g_bytes_transferred = 0;
 }
 
 const char* net_get_current_tech() {
-    return g_current_tech;
+    return ps4b::g_current_tech;
 }
 
 } // namespace ps4b
