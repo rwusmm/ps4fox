@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential git cmake
+          sudo apt-get install -y build-essential git cmake python3
 
       - name: Configure build
         run: |
@@ -38,10 +38,23 @@ jobs:
       - name: Package PS4b
         run: |
           mkdir -p pkg
-          if command -v ps4-packager >/dev/null 2>&1; then
-            ps4-packager build/PS4b.self pkg/PS4b.pkg
+
+          # Copy the built binary as artifact
+          if [ -f build/PS4b.self ]; then
+            cp build/PS4b.self pkg/PS4b.self
+            echo "Found PS4b.self"
           elif [ -f build/PS4b ]; then
-            cp build/PS4b pkg/PS4b.pkg
+            cp build/PS4b pkg/PS4b
+            echo "Found PS4b"
+          else
+            echo "No binary found in build/"
+            ls -la build/
+          fi
+
+          # Check for OpenOrbis packaging tools
+          if [ -d "$OO_TOOLCHAIN/tools" ]; then
+            echo "OpenOrbis tools directory found"
+            ls -la "$OO_TOOLCHAIN/tools"
           fi
 
       - name: Upload artifact
