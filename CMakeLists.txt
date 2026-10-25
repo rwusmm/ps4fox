@@ -59,18 +59,19 @@ target_link_directories(PS4b PRIVATE
 )
 
 # OpenOrbis library stubs required for PS4 system calls
+# Use full paths to avoid CMake's -l prefix/stripping behavior
 target_link_libraries(PS4b PRIVATE
     litehtml
-    libkernel.so
-    libSceSysmodule.so
-    libSceNet.so
-    libSceSsl.so
-    libSceHttp.so
-    libSceVideoOut.so
-    libSceAudioOut.so
-    libSceUserService.so
-    libScePad.so
-    libSceSystemService.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/lib/libkernel.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/lib/libSceSysmodule.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/lib/libSceNet.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/lib/libSceSsl.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/lib/libSceHttp.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/lib/libSceVideoOut.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/lib/libSceAudioOut.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/lib/libSceUserService.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/lib/libScePad.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/lib/libSceSystemService.so
 )
 
 # Set output name to PS4b (matching the expected build/PS4b.self)
