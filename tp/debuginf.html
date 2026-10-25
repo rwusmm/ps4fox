@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+        overflow: hidden;
+    }
+
+    .overlay-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 15px;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 1.2;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        -webkit-font-smoothing: none;
+        -moz-osx-font-smoothing: grayscale;
+        font-smooth: never;
+        pointer-events: none;
+    }
+
+    .text-line {
+        display: table;
+        background-color: rgba(0, 0, 0, 0.75);
+        padding: 1px 6px 2px 6px;
+        margin-bottom: 0;
+    }
+
+    .text-yellow {
+        color: #e8e88d;
+        text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+    }
+
+    .text-red {
+        color: #ff7b5c;
+        text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+    }
+
+    .text-cyan {
+        color: #a0e0e8;
+        text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+    }
+</style>
+</head>
+<body>
+
+<div class="overlay-wrapper">
+    <div class="text-line text-yellow">FPS: 59.9</div>
+    <div class="text-line text-red">MB TRANSFERED THROUGH SESSION: 12MB</div>
+    <div class="text-line text-cyan">CURRENT TECH: HTTPS</div>
+</div>
+
+</body>
+</html>

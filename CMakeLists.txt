@@ -52,8 +52,26 @@ target_include_directories(PS4b PUBLIC
     tp/openorbis/include
 )
 
-# Link against litehtml
-target_link_libraries(PS4b PRIVATE litehtml)
+# Link libraries
+target_link_directories(PS4b PRIVATE
+    tp/openorbis/lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/lib
+)
+
+# OpenOrbis library stubs required for PS4 system calls
+target_link_libraries(PS4b PRIVATE
+    litehtml
+    kernel
+    SceSysmodule
+    SceNet
+    SceSsl
+    SceHttp
+    SceVideoOut
+    SceAudioOut
+    SceUserService
+    ScePad
+    SceSystemService
+)
 
 # Set output name to PS4b (matching the expected build/PS4b.self)
 set_target_properties(PS4b PROPERTIES OUTPUT_NAME "PS4b")
