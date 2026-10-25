@@ -3,6 +3,3 @@ build/
 *.artifact
 *.tar.gz
 *.zip
-
-# ORBIS Toolchain
-tp/openorbis/
