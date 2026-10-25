@@ -28,6 +28,10 @@ static int32_t g_net_pool_id = -1;
 static int32_t g_http_ctx_id = -1;
 static int32_t g_ssl_ctx_id = -1;
 
+// Statistics tracking
+static size_t g_bytes_transferred = 0;
+static char g_current_tech[16] = "HTTP";
+
 bool is_net_ready() {
     return g_http_initialized;
 }
@@ -109,8 +113,78 @@ bool http_fetch(const char* url, uint8_t** out_data, size_t* out_size) {
 
     orbisfox::log("PS4b Net: Fetching URL: %s", url);
 
+    // Determine current technology
+    if (strncmp(url, "https://", 8) == 0) {
+        strcpy(g_current_tech, "HTTPS");
+    } else if (strncmp(url, "http://", 7) == 0) {
+        strcpy(g_current_tech, "HTTP");
+    } else if (strncmp(url, "b://", 4) == 0) {
+        strcpy(g_current_tech, "LOCAL");
+    }
+
     // Local home and blank pages
     if (strcmp(url, "about:blank") == 0 || strcmp(url, "http://about:blank") == 0) {
+        const char* blank_html =
+            "<!DOCTYPE html><html><head><style>"
+            "body { background: #131b2f; color: #e1e9f8; font-family: sans-serif; padding: 24px; }"
+            "h1 { color: #5bc0be; font-size: 32px; border-bottom: 2px solid #3a506b; padding-bottom: 8px; }"
+            "p { font-size: 18px; line-height: 1.6; color: #cbd5e1; }"
+            ".card { background: #1c2541; padding: 16px; border-radius: 8px; border: 1px solid #3a506b; margin-top: 16px; }"
+            "code { background: #0b132b; color: #6fffe9; padding: 2px 6px; border-radius: 4px; }"
+            "</style></head><body>"
+            "<h1>PS4b Web Browser</h1>"
+            "<div class='card'>"
+            "<p>Browser engine online. Enter a URL to browse the web.</p>"
+            "<p>Engine components: <code>LiteHTML Layout</code>, <code>CSS3 Styles</code>, <code>TLS 1.2/1.3</code>, and <code>HTTP/1.1 Client</code>.</p>"
+            "</div></body></html>";
+        size_t len = strlen(blank_html);
+        *out_data = static_cast<uint8_t*>(malloc(len + 1));
+        if (*out_data) {
+            memcpy(*out_data, blank_html, len + 1);
+            *out_size = len;
+            return true;
+        }
+        return false;
+    }
+
+    // Settings page
+    if (strcmp(url, "b://settings") == 0) {
+        const char* settings_html =
+            "<!DOCTYPE html><html><head><style>"
+            "body { background: #131b2f; color: #e1e9f8; font-family: sans-serif; padding: 24px; }"
+            "h1 { color: #5bc0be; font-size: 32px; border-bottom: 2px solid #3a506b; padding-bottom: 8px; }"
+            ".card { background: #1c2541; padding: 16px; border-radius: 8px; border: 1px solid #3a506b; margin-top: 16px; }"
+            ".setting-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #3a506b; }"
+            ".setting-row:last-child { border-bottom: none; }"
+            ".toggle { position: relative; width: 50px; height: 26px; background: #3a506b; border-radius: 13px; cursor: pointer; transition: background 0.3s; }"
+            ".toggle.active { background: #5bc0be; }"
+            ".toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; background: #e1e9f8; border-radius: 50%; transition: transform 0.3s; }"
+            ".toggle.active::after { transform: translateX(24px); }"
+            "label { font-size: 16px; color: #cbd5e1; }"
+            "</style></head><body>"
+            "<h1>PS4b Settings</h1>"
+            "<div class='card'>"
+            "<div class='setting-row'>"
+            "<label>Dev Debug Interface</label>"
+            "<div class='toggle' id='debugToggle' onclick='toggleDebug()'></div>"
+            "</div>"
+            "</div>"
+            "<script>"
+            "function toggleDebug() {"
+            "  var toggle = document.getElementById('debugToggle');"
+            "  toggle.classList.toggle('active');"
+            "  js_toggle_debug(toggle.classList.contains('active'));"
+            "}"
+            "</script></body></html>";
+        size_t len = strlen(settings_html);
+        *out_data = static_cast<uint8_t*>(malloc(len + 1));
+        if (*out_data) {
+            memcpy(*out_data, settings_html, len + 1);
+            *out_size = len;
+            return true;
+        }
+        return false;
+    }
         const char* blank_html =
             "<!DOCTYPE html><html><head><style>"
             "body { background: #131b2f; color: #e1e9f8; font-family: sans-serif; padding: 24px; }"
@@ -146,6 +220,8 @@ bool http_fetch(const char* url, uint8_t** out_data, size_t* out_size) {
         return false;
     }
 
+    // HTTP/2 support can be enabled with sceHttpSetEnableHttp2 if available in SDK
+
     int32_t connId = sceHttpCreateConnectionWithURL(tmplId, url, true);
     if (connId < 0) {
         orbisfox::log("PS4b Net: sceHttpCreateConnectionWithURL failed: 0x%08x", (unsigned)connId);
@@ -180,6 +256,7 @@ bool http_fetch(const char* url, uint8_t** out_data, size_t* out_size) {
 
     while ((readBytes = sceHttpReadData(reqId, chunk, sizeof(chunk))) > 0) {
         buffer.insert(buffer.end(), chunk, chunk + readBytes);
+        net_add_bytes_transferred(readBytes);
         if (buffer.size() > 8 * 1024 * 1024) break; // 8MB safety cap
     }
 
@@ -199,6 +276,23 @@ bool http_fetch(const char* url, uint8_t** out_data, size_t* out_size) {
 #endif
 
     return false;
+}
+
+// Statistics functions
+void net_add_bytes_transferred(size_t bytes) {
+    g_bytes_transferred += bytes;
+}
+
+size_t net_get_bytes_transferred() {
+    return g_bytes_transferred;
+}
+
+void net_reset_bytes_transferred() {
+    g_bytes_transferred = 0;
+}
+
+const char* net_get_current_tech() {
+    return g_current_tech;
 }
 
 } // namespace ps4b

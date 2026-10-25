@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <algorithm>
 #include <map>
 #include <vector>
@@ -277,19 +278,79 @@ public:
     }
 
     void draw_linear_gradient(litehtml::uint_ptr /*hdc*/, const litehtml::background_layer& layer,
-                              const litehtml::background_layer::linear_gradient& /*gradient*/) override {
-        fill_rect(layer.border_box.x, layer.border_box.y, layer.border_box.width, layer.border_box.height,
-                  24, 32, 48, 255);
+                              const litehtml::background_layer::linear_gradient& gradient) override {
+        int x = static_cast<int>(layer.border_box.x);
+        int y = static_cast<int>(layer.border_box.y);
+        int w = static_cast<int>(layer.border_box.width);
+        int h = static_cast<int>(layer.border_box.height);
+
+        if (gradient.stops.empty()) {
+            fill_rect(x, y, w, h, 24, 32, 48, 255);
+            return;
+        }
+
+        // Simple horizontal gradient implementation
+        for (int px = 0; px < w; ++px) {
+            float t = static_cast<float>(px) / static_cast<float>(w);
+            if (t < 0) t = 0;
+            if (t > 1) t = 1;
+
+            // Find gradient stops
+            litehtml::web_color color1 = gradient.stops.front().color;
+            litehtml::web_color color2 = gradient.stops.back().color;
+
+            // Interpolate
+            uint8_t r = static_cast<uint8_t>(color1.red + (color2.red - color1.red) * t);
+            uint8_t g = static_cast<uint8_t>(color1.green + (color2.green - color1.green) * t);
+            uint8_t b = static_cast<uint8_t>(color1.blue + (color2.blue - color1.blue) * t);
+            uint8_t a = static_cast<uint8_t>(color1.alpha + (color2.alpha - color1.alpha) * t);
+
+            fill_rect(x + px, y, 1, h, r, g, b, a);
+        }
     }
 
     void draw_radial_gradient(litehtml::uint_ptr /*hdc*/, const litehtml::background_layer& layer,
-                              const litehtml::background_layer::radial_gradient& /*gradient*/) override {
-        fill_rect(layer.border_box.x, layer.border_box.y, layer.border_box.width, layer.border_box.height,
-                  24, 32, 48, 255);
+                              const litehtml::background_layer::radial_gradient& gradient) override {
+        int x = static_cast<int>(layer.border_box.x);
+        int y = static_cast<int>(layer.border_box.y);
+        int w = static_cast<int>(layer.border_box.width);
+        int h = static_cast<int>(layer.border_box.height);
+
+        if (gradient.stops.empty()) {
+            fill_rect(x, y, w, h, 24, 32, 48, 255);
+            return;
+        }
+
+        // Simple radial gradient (circle)
+        int cx = x + w / 2;
+        int cy = y + h / 2;
+        int radius = std::min(w, h) / 2;
+
+        litehtml::web_color color1 = gradient.stops.front().color;
+        litehtml::web_color color2 = gradient.stops.back().color;
+
+        for (int py = 0; py < h; ++py) {
+            for (int px = 0; px < w; ++px) {
+                int dx = (x + px) - cx;
+                int dy = (y + py) - cy;
+                float dist = sqrtf(static_cast<float>(dx * dx + dy * dy));
+                float t = dist / radius;
+                if (t < 0) t = 0;
+                if (t > 1) t = 1;
+
+                uint8_t r = static_cast<uint8_t>(color1.red + (color2.red - color1.red) * t);
+                uint8_t g = static_cast<uint8_t>(color1.green + (color2.green - color1.green) * t);
+                uint8_t b = static_cast<uint8_t>(color1.blue + (color2.blue - color1.blue) * t);
+                uint8_t a = static_cast<uint8_t>(color1.alpha + (color2.alpha - color1.alpha) * t);
+
+                put_pixel(x + px, y + py, r, g, b, a);
+            }
+        }
     }
 
     void draw_conic_gradient(litehtml::uint_ptr /*hdc*/, const litehtml::background_layer& layer,
                              const litehtml::background_layer::conic_gradient& /*gradient*/) override {
+        // Fallback to solid fill for conic gradients (complex to implement)
         fill_rect(layer.border_box.x, layer.border_box.y, layer.border_box.width, layer.border_box.height,
                   24, 32, 48, 255);
     }
@@ -435,6 +496,32 @@ void litehtml_renderer::resize(int width, int height) {
     }
     if (m_doc) {
         m_doc->render(m_width);
+    }
+}
+
+void litehtml_renderer::draw_box_shadow(int x, int y, int w, int h, int offset_x, int offset_y, int blur_radius, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (!m_container) return;
+
+    int shadow_x = x + offset_x;
+    int shadow_y = y + offset_y;
+
+    if (blur_radius <= 0) {
+        // Simple shadow without blur
+        m_container->fill_rect(shadow_x, shadow_y, w, h, r, g, b, a);
+    } else {
+        // Simple box blur approximation
+        int blur_samples = blur_radius * 2 + 1;
+        for (int dy = -blur_radius; dy <= blur_radius; ++dy) {
+            for (int dx = -blur_radius; dx <= blur_radius; ++dx) {
+                float dist = sqrtf(static_cast<float>(dx * dx + dy * dy));
+                if (dist > blur_radius) continue;
+
+                float alpha_mult = 1.0f - (dist / blur_radius);
+                uint8_t shadow_a = static_cast<uint8_t>(a * alpha_mult);
+
+                m_container->fill_rect(shadow_x + dx, shadow_y + dy, w, h, r, g, b, shadow_a);
+            }
+        }
     }
 }
 

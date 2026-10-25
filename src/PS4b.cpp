@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <string>
+#include <time.h>
 
 #if __has_include(<orbis/libkernel.h>)
 #include <orbis/libkernel.h>
@@ -29,6 +30,11 @@ namespace {
 static ps4_browser::litehtml_renderer g_renderer;
 static Presenter* g_hardware_presenter = nullptr;
 static constexpr int TOP_BAR_HEIGHT = 38;
+
+// FPS tracking
+static uint64_t g_frame_count = 0;
+static uint64_t g_last_time = 0;
+static float g_fps = 0.0f;
 
 void on_page_navigate(const char* url) {
     uint8_t* payload = nullptr;
@@ -72,6 +78,29 @@ void draw_browser_frame(Surface& s, int cursor_x, int cursor_y) {
     if (cursor_x >= 0 && cursor_y >= 0) {
         orbisfox::fill_rect(s, cursor_x - 6, cursor_y - 1, 13, 3, {245, 145, 45, 255});
         orbisfox::fill_rect(s, cursor_x - 1, cursor_y - 6, 3, 13, {245, 145, 45, 255});
+    }
+
+    // Draw debug overlay if enabled
+    if (ps4b::nav_is_debug_enabled()) {
+        // FPS
+        char fps_text[32];
+        snprintf(fps_text, sizeof(fps_text), "FPS: %.1f", g_fps);
+        orbisfox::fill_rect(s, 15, 15, strlen(fps_text) * 8 + 12, 20, {0, 0, 0, 191});
+        orbisfox::text(s, 20, 18, fps_text, 1, {232, 232, 141, 255});
+
+        // MB transferred
+        size_t mb_transferred = ps4b::net_get_bytes_transferred() / (1024 * 1024);
+        char mb_text[64];
+        snprintf(mb_text, sizeof(mb_text), "MB TRANSFERED THROUGH SESSION: %zuMB", mb_transferred);
+        orbisfox::fill_rect(s, 15, 40, strlen(mb_text) * 8 + 12, 20, {0, 0, 0, 191});
+        orbisfox::text(s, 20, 43, mb_text, 1, {255, 123, 92, 255});
+
+        // Current technology
+        const char* tech = ps4b::net_get_current_tech();
+        char tech_text[32];
+        snprintf(tech_text, sizeof(tech_text), "CURRENT TECH: %s", tech);
+        orbisfox::fill_rect(s, 15, 65, strlen(tech_text) * 8 + 12, 20, {0, 0, 0, 191});
+        orbisfox::text(s, 20, 68, tech_text, 1, {160, 224, 232, 255});
     }
 }
 
@@ -170,8 +199,33 @@ int main() {
     uint32_t prev_buttons = 0;
     bool running = true;
 
+    // FPS timing
+    uint64_t fps_update_interval = 2000000; // 2 seconds in microseconds
+    uint64_t last_fps_update = 0;
+#if __has_include(<orbis/libkernel.h>)
+    last_fps_update = sceKernelGetProcessTime();
+#else
+    last_fps_update = 0;
+#endif
+
     // Interactive rendering and event loop
     while (running) {
+        g_frame_count++;
+
+#if __has_include(<orbis/libkernel.h>)
+        uint64_t current_time = sceKernelGetProcessTime();
+#else
+        uint64_t current_time = g_frame_count * 16000;
+#endif
+
+        // Update FPS every 2 seconds
+        if (current_time - last_fps_update >= fps_update_interval) {
+            uint64_t elapsed_us = current_time - last_fps_update;
+            g_fps = (g_frame_count * 1000000.0f) / elapsed_us;
+            g_frame_count = 0;
+            last_fps_update = current_time;
+        }
+
         OrbisPadData input{};
         if (controller.poll(input)) {
             uint32_t pressed = input.buttons & ~prev_buttons;

@@ -61,16 +61,16 @@ target_link_directories(PS4b PRIVATE
 # OpenOrbis library stubs required for PS4 system calls
 target_link_libraries(PS4b PRIVATE
     litehtml
-    kernel
-    SceSysmodule
-    SceNet
-    SceSsl
-    SceHttp
-    SceVideoOut
-    SceAudioOut
-    SceUserService
-    ScePad
-    SceSystemService
+    libkernel.so
+    libSceSysmodule.so
+    libSceNet.so
+    libSceSsl.so
+    libSceHttp.so
+    libSceVideoOut.so
+    libSceAudioOut.so
+    libSceUserService.so
+    libScePad.so
+    libSceSystemService.so
 )
 
 # Set output name to PS4b (matching the expected build/PS4b.self)

@@ -31,6 +31,9 @@ public:
     // Render the HTML content to the surface buffer with optional offset
     void render(uint8_t* framebuffer, int fb_width, int fb_height, int offset_x = 0, int offset_y = 0, const litehtml::position* clip_rect = nullptr);
 
+    // Support for CSS box-shadow
+    void draw_box_shadow(int x, int y, int w, int h, int offset_x, int offset_y, int blur_radius, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+
     // Resize the renderer
     void resize(int width, int height);
 
