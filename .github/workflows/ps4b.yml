@@ -29,7 +29,7 @@ jobs:
 
       - name: Configure build
         run: |
-          cmake -B build -S .
+          cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=$OO_TOOLCHAIN/orbis-llvm.cmake
 
       - name: Build PS4b
         run: |
