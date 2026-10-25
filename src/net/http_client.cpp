@@ -20,20 +20,11 @@
 #include <orbis/Net.h>
 #endif
 
-#ifndef ORBIS_SYSMODULE_INTERNAL_NET
-#define ORBIS_SYSMODULE_INTERNAL_NET 0x000c
-#endif
-#ifndef ORBIS_SYSMODULE_INTERNAL_HTTP
-#define ORBIS_SYSMODULE_INTERNAL_HTTP 0x000e
-#endif
-#ifndef ORBIS_SYSMODULE_INTERNAL_SSL
-#define ORBIS_SYSMODULE_INTERNAL_SSL 0x0014
-#endif
-
 namespace ps4b {
 
 static bool g_http_initialized = false;
 static bool g_ssl_initialized = false;
+static int32_t g_net_pool_id = -1;
 static int32_t g_http_ctx_id = -1;
 static int32_t g_ssl_ctx_id = -1;
 
@@ -54,8 +45,15 @@ bool net_init() {
     sceSysmoduleLoadModuleInternal(ORBIS_SYSMODULE_INTERNAL_SSL);
     sceSysmoduleLoadModuleInternal(ORBIS_SYSMODULE_INTERNAL_HTTP);
 
-    // Initialize SSL (32KB memory pool)
-    g_ssl_ctx_id = sceSslInit(32 * 1024);
+    // Initialize Net subsystem and pool
+    int32_t netRc = sceNetInit();
+    orbisfox::log("PS4b Net: sceNetInit rc=0x%08x", (unsigned)netRc);
+
+    g_net_pool_id = sceNetPoolCreate("ps4b_net_pool", 64 * 1024, 0);
+    orbisfox::log("PS4b Net: sceNetPoolCreate id=%d", g_net_pool_id);
+
+    // Initialize SSL (64KB memory pool)
+    g_ssl_ctx_id = sceSslInit(64 * 1024);
     if (g_ssl_ctx_id >= 0) {
         g_ssl_initialized = true;
         orbisfox::log("PS4b Net: TLS/SSL initialized (ctx=%d)", g_ssl_ctx_id);
@@ -63,8 +61,10 @@ bool net_init() {
         orbisfox::log("PS4b Net: sceSslInit rc=0x%08x", (unsigned)g_ssl_ctx_id);
     }
 
-    // Initialize HTTP client context (128KB pool)
-    g_http_ctx_id = sceHttpInit(128 * 1024);
+    // Initialize HTTP client context with memory pool and ssl context
+    int32_t memPoolId = g_net_pool_id >= 0 ? g_net_pool_id : 0;
+    int32_t sslId = g_ssl_ctx_id >= 0 ? g_ssl_ctx_id : 0;
+    g_http_ctx_id = sceHttpInit(memPoolId, sslId, 128 * 1024);
     if (g_http_ctx_id >= 0) {
         g_http_initialized = true;
         orbisfox::log("PS4b Net: HTTP initialized (ctx=%d)", g_http_ctx_id);
@@ -87,10 +87,15 @@ void net_shutdown() {
         g_http_initialized = false;
     }
     if (g_ssl_ctx_id >= 0) {
-        sceSslTerm(g_ssl_ctx_id);
+        sceSslTerm();
         g_ssl_ctx_id = -1;
         g_ssl_initialized = false;
     }
+    if (g_net_pool_id >= 0) {
+        sceNetPoolDestroy(g_net_pool_id);
+        g_net_pool_id = -1;
+    }
+    sceNetTerm();
 #else
     g_http_initialized = false;
     g_ssl_initialized = false;

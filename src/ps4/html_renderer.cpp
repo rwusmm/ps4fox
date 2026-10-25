@@ -166,7 +166,7 @@ public:
     // document_container interface
     litehtml::uint_ptr create_font(const litehtml::font_description& descr, const litehtml::document* /*doc*/,
                                    litehtml::font_metrics* fm) override {
-        int size = descr.size > 0 ? descr.size : 16;
+        int size = static_cast<int>(descr.size) > 0 ? static_cast<int>(descr.size) : 16;
         if (fm) {
             fm->ascent = static_cast<int>(size * 0.8f);
             fm->descent = static_cast<int>(size * 0.2f);
@@ -182,7 +182,9 @@ public:
         if (!text) return 0;
         int size = static_cast<int>(hFont);
         if (size <= 0) size = 16;
-        float char_width = size * 0.6f;
+        float scale = size / 8.0f;
+        if (scale < 1.0f) scale = 1.0f;
+        float char_width = 8.0f * scale;
         return static_cast<litehtml::pixel_t>(strlen(text) * char_width);
     }
 
@@ -234,33 +236,42 @@ public:
 
     void draw_solid_fill(litehtml::uint_ptr /*hdc*/, const litehtml::background_layer& layer,
                          const litehtml::web_color& color) override {
-        fill_rect(layer.border_box.x, layer.border_box.y,
-                  layer.border_box.width, layer.border_box.height,
+        fill_rect(static_cast<int>(layer.border_box.x), static_cast<int>(layer.border_box.y),
+                  static_cast<int>(layer.border_box.width), static_cast<int>(layer.border_box.height),
                   color.red, color.green, color.blue, color.alpha);
     }
 
     void draw_borders(litehtml::uint_ptr /*hdc*/, const litehtml::borders& borders,
                       const litehtml::position& draw_pos, bool /*root*/) override {
+        int top_w = static_cast<int>(borders.top.width);
+        int bottom_w = static_cast<int>(borders.bottom.width);
+        int left_w = static_cast<int>(borders.left.width);
+        int right_w = static_cast<int>(borders.right.width);
+        int dx = static_cast<int>(draw_pos.x);
+        int dy = static_cast<int>(draw_pos.y);
+        int dw = static_cast<int>(draw_pos.width);
+        int dh = static_cast<int>(draw_pos.height);
+
         // Top border
-        if (borders.top.width > 0 && borders.top.color.alpha > 0) {
-            fill_rect(draw_pos.x, draw_pos.y, draw_pos.width, borders.top.width,
+        if (top_w > 0 && borders.top.color.alpha > 0) {
+            fill_rect(dx, dy, dw, top_w,
                       borders.top.color.red, borders.top.color.green, borders.top.color.blue, borders.top.color.alpha);
         }
         // Bottom border
-        if (borders.bottom.width > 0 && borders.bottom.color.alpha > 0) {
-            fill_rect(draw_pos.x, draw_pos.y + draw_pos.height - borders.bottom.width,
-                      draw_pos.width, borders.bottom.width,
+        if (bottom_w > 0 && borders.bottom.color.alpha > 0) {
+            fill_rect(dx, dy + dh - bottom_w,
+                      dw, bottom_w,
                       borders.bottom.color.red, borders.bottom.color.green, borders.bottom.color.blue, borders.bottom.color.alpha);
         }
         // Left border
-        if (borders.left.width > 0 && borders.left.color.alpha > 0) {
-            fill_rect(draw_pos.x, draw_pos.y, borders.left.width, draw_pos.height,
+        if (left_w > 0 && borders.left.color.alpha > 0) {
+            fill_rect(dx, dy, left_w, dh,
                       borders.left.color.red, borders.left.color.green, borders.left.color.blue, borders.left.color.alpha);
         }
         // Right border
-        if (borders.right.width > 0 && borders.right.color.alpha > 0) {
-            fill_rect(draw_pos.x + draw_pos.width - borders.right.width, draw_pos.y,
-                      borders.right.width, draw_pos.height,
+        if (right_w > 0 && borders.right.color.alpha > 0) {
+            fill_rect(dx + dw - right_w, dy,
+                      right_w, dh,
                       borders.right.color.red, borders.right.color.green, borders.right.color.blue, borders.right.color.alpha);
         }
     }
@@ -400,7 +411,7 @@ bool litehtml_renderer::load_image(const std::string& /*image_path*/) {
     return true;
 }
 
-void litehtml_renderer::render(uint8_t* framebuffer, int fb_width, int fb_height, const litehtml::position* clip_rect) {
+void litehtml_renderer::render(uint8_t* framebuffer, int fb_width, int fb_height, int offset_x, int offset_y, const litehtml::position* clip_rect) {
     if (!m_doc || !m_container || !framebuffer) {
         return;
     }
@@ -412,7 +423,7 @@ void litehtml_renderer::render(uint8_t* framebuffer, int fb_width, int fb_height
         clip = *clip_rect;
     }
 
-    m_doc->draw(reinterpret_cast<litehtml::uint_ptr>(framebuffer), 0, 0, &clip);
+    m_doc->draw(reinterpret_cast<litehtml::uint_ptr>(framebuffer), offset_x, offset_y, &clip);
 }
 
 void litehtml_renderer::resize(int width, int height) {

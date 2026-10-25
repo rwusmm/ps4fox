@@ -28,8 +28,8 @@ public:
     // Load image for rendering
     bool load_image(const std::string& image_path);
 
-    // Render the HTML content to the surface buffer
-    void render(uint8_t* framebuffer, int fb_width, int fb_height, const litehtml::position* clip_rect = nullptr);
+    // Render the HTML content to the surface buffer with optional offset
+    void render(uint8_t* framebuffer, int fb_width, int fb_height, int offset_x = 0, int offset_y = 0, const litehtml::position* clip_rect = nullptr);
 
     // Resize the renderer
     void resize(int width, int height);

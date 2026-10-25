@@ -18,18 +18,16 @@ set(PS4_SOURCES
     src/PS4b.cpp
     src/browser_navigation.cpp
     src/net/http_client.cpp
+    src/shader_table.cpp
     src/surface.cpp
     src/touch_cursor.cpp
     src/ui.cpp
     src/ps4/html_renderer.cpp
     src/ps4/modules.cpp
     src/ps4/native_audio.cpp
-    src/ps4/piglet.cpp
     src/ps4/platform.cpp
     src/ps4/run_logs.cpp
-    src/ps4/rust_runtime.cpp
     src/ps4/services.cpp
-    src/ps4/startup.cpp
     src/ps4/videoout.cpp
 )
 
