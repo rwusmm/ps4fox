@@ -33,6 +33,12 @@ jobs:
 
       - name: Build PS4b
         run: |
+          # Check available libraries
+          echo "=== Checking OpenOrbis libraries ==="
+          ls -la tp/openorbis/lib/ | head -50
+          echo "=== Checking for kernel lib ==="
+          find tp/openorbis -name "*kernel*" -o -name "*SceNet*" -o -name "*SceHttp*" | head -20
+          echo "=== Building ==="
           cmake --build build --target PS4b -j 3
 
       - name: Package PS4b
