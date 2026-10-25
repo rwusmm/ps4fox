@@ -25,11 +25,11 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential git cmake python3
+          sudo apt-get install -y build-essential git cmake clang lld python3
 
       - name: Configure build
         run: |
-          cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=$OO_TOOLCHAIN/orbis-llvm.cmake
+          cmake -B build -S .
 
       - name: Build PS4b
         run: |
