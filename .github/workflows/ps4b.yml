@@ -18,8 +18,8 @@ jobs:
 
       - name: Set up ORBIS SDK
         run: |
-          # Download pre-built release with libraries
-          wget -q https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain/releases/download/v0.5.4/toolchain-llvm-18.tar.gz -O /tmp/openorbis.tar.gz
+          # Download v0.5.2 which has proper stdlib headers
+          wget -q https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain/releases/download/v0.5.2/v0.5.2.tar.gz -O /tmp/openorbis.tar.gz
           mkdir -p tp
           tar -xf /tmp/openorbis.tar.gz -C tp
           echo "$GITHUB_WORKSPACE/tp/openorbis/bin/linux" >> $GITHUB_PATH
