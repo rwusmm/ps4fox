@@ -247,6 +247,9 @@ public:
     std::string m_element_type;
     bool m_is_hovered = false;
     bool m_is_active = false;
+    litehtml::position m_element_pos;
+    litehtml::element::ptr m_current_element;
+    std::string m_page_title;
 
     void draw_borders(litehtml::uint_ptr /*hdc*/, const litehtml::borders& borders,
                       const litehtml::position& draw_pos, bool /*root*/) override {
@@ -356,10 +359,20 @@ public:
         culture = "US";
     }
 
-    litehtml::element::ptr create_element(const char* tag_name, const litehtml::string_map& /*attributes*/,
-                                          const std::shared_ptr<litehtml::document>& /*doc*/) override {
-        if (tag_name && strcmp(tag_name, "button") == 0) {
-            m_element_type = "button";
+    litehtml::element::ptr create_element(const char* tag_name, const litehtml::string_map& attributes,
+                                          const std::shared_ptr<litehtml::document>& doc) override {
+        if (tag_name) {
+            if (strcmp(tag_name, "button") == 0) {
+                m_element_type = "button";
+            } else if (strcmp(tag_name, "title") == 0) {
+                // Store title element for later extraction
+            } else if (strcmp(tag_name, "a") == 0) {
+                // Link element
+                auto it = attributes.find("href");
+                if (it != attributes.end()) {
+                    // Store href for navigation
+                }
+            }
         }
         return nullptr;
     }
@@ -500,6 +513,32 @@ void litehtml_renderer::draw_box_shadow(int x, int y, int w, int h, int offset_x
             }
         }
     }
+}
+
+void litehtml_renderer::handle_mouse_move(int x, int y) {
+    if (!m_doc || !m_container) return;
+
+    // Find element at position
+    litehtml::element::ptr el = m_doc->get_element_by_point(x, y, 0, 0);
+    if (el) {
+        m_container->m_current_element = el;
+        // Trigger hover event
+        m_container->on_mouse_event(el, litehtml::mouse_event::MOUSE_ENTER);
+    }
+}
+
+void litehtml_renderer::handle_mouse_click(int x, int y) {
+    if (!m_doc || !m_container) return;
+
+    litehtml::element::ptr el = m_doc->get_element_by_point(x, y, 0, 0);
+    if (el) {
+        m_container->on_mouse_event(el, litehtml::mouse_event::MOUSE_DOWN);
+        m_container->on_mouse_event(el, litehtml::mouse_event::MOUSE_UP);
+    }
+}
+
+std::string litehtml_renderer::get_page_title() const {
+    return m_container ? m_container->m_page_title : "";
 }
 
 } // namespace ps4_browser

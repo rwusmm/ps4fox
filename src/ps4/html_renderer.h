@@ -44,6 +44,11 @@ public:
     // Check if initialized
     bool is_initialized() const { return m_doc != nullptr; }
 
+    // Handle mouse events for interactivity
+    void handle_mouse_move(int x, int y);
+    void handle_mouse_click(int x, int y);
+    std::string get_page_title() const;
+
 private:
     class container_impl;
     std::unique_ptr<container_impl> m_container;

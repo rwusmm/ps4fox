@@ -80,6 +80,9 @@ void draw_browser_frame(Surface& s, int cursor_x, int cursor_y) {
         orbisfox::fill_rect(s, cursor_x - 1, cursor_y - 6, 3, 13, {245, 145, 45, 255});
     }
 
+    // Handle mouse events for HTML interactivity
+    g_renderer.handle_mouse_move(cursor_x, cursor_y - TOP_BAR_HEIGHT);
+
     // Draw debug overlay if enabled
     if (ps4b::nav_is_debug_enabled()) {
         // FPS
@@ -239,8 +242,9 @@ int main() {
                 break;
             }
 
-            // Cross button: reload page
+            // Cross button: reload page or click element
             if (pressed & ORBIS_PAD_BUTTON_CROSS) {
+                g_renderer.handle_mouse_click(cursor_x, cursor_y - TOP_BAR_HEIGHT);
                 ps4b::nav_reload();
             }
 
