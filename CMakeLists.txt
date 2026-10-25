@@ -45,8 +45,8 @@ add_executable(PS4b ${PS4_SOURCES} ${PS4_HEADERS})
 
 # PS4 cross-compilation flags for PS4b target only
 target_compile_options(PS4b PRIVATE
-    $<$<COMPILE_LANGUAGE:C>:--target=x86_64-pc-freebsd12-elf -fPIC -funwind-tables -isysroot ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis -isystem ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/include>
-    $<$<COMPILE_LANGUAGE:CXX>:--target=x86_64-pc-freebsd12-elf -fPIC -funwind-tables -isysroot ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis -isystem ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/include -isystem ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/include/c++/v1>
+    $<$<COMPILE_LANGUAGE:C>:--target=x86_64-pc-freebsd12-elf -fPIC -funwind-tables -isysroot ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis -isystem ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/include -nostdlibinc>
+    $<$<COMPILE_LANGUAGE:CXX>:--target=x86_64-pc-freebsd12-elf -fPIC -funwind-tables -isysroot ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis -isystem ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/include -isystem ${CMAKE_CURRENT_SOURCE_DIR}/tp/openorbis/include/c++/v1 -nostdlibinc -nostdinc++>
 )
 
 target_link_options(PS4b PRIVATE
@@ -86,6 +86,8 @@ target_link_libraries(PS4b PRIVATE
     SceUserService
     ScePad
     SceSystemService
+    c++
+    c
 )
 
 # Set output name to PS4b (matching the expected build/PS4b.self)
