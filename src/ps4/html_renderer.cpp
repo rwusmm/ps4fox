@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <map>
 #include <vector>
+#include <cstring>
 
 namespace ps4_browser {
 
@@ -242,6 +243,11 @@ public:
                   color.red, color.green, color.blue, color.alpha);
     }
 
+    // Store element type for special rendering
+    std::string m_element_type;
+    bool m_is_hovered = false;
+    bool m_is_active = false;
+
     void draw_borders(litehtml::uint_ptr /*hdc*/, const litehtml::borders& borders,
                       const litehtml::position& draw_pos, bool /*root*/) override {
         int top_w = static_cast<int>(borders.top.width);
@@ -252,6 +258,18 @@ public:
         int dy = static_cast<int>(draw_pos.y);
         int dw = static_cast<int>(draw_pos.width);
         int dh = static_cast<int>(draw_pos.height);
+
+        // Button-specific border rendering with rounded corners effect
+        if (m_element_type == "button") {
+            int radius = std::min({top_w, bottom_w, left_w, right_w, 4});
+            if (radius > 0) {
+                // Simple rounded effect by adjusting border positions
+                top_w = radius;
+                bottom_w = radius;
+                left_w = radius;
+                right_w = radius;
+            }
+        }
 
         // Top border
         if (top_w > 0 && borders.top.color.alpha > 0) {
@@ -338,14 +356,30 @@ public:
         culture = "US";
     }
 
-    litehtml::element::ptr create_element(const char* /*tag_name*/, const litehtml::string_map& /*attributes*/,
+    litehtml::element::ptr create_element(const char* tag_name, const litehtml::string_map& /*attributes*/,
                                           const std::shared_ptr<litehtml::document>& /*doc*/) override {
+        if (tag_name && strcmp(tag_name, "button") == 0) {
+            m_element_type = "button";
+        }
         return nullptr;
     }
 
     void link(const std::shared_ptr<litehtml::document>& /*doc*/, const litehtml::element::ptr& /*el*/) override {}
     void on_anchor_click(const char* /*url*/, const litehtml::element::ptr& /*el*/) override {}
-    void on_mouse_event(const litehtml::element::ptr& /*el*/, litehtml::mouse_event /*event*/) override {}
+    void on_mouse_event(const litehtml::element::ptr& el, litehtml::mouse_event event) override {
+        if (el && m_element_type == "button") {
+            if (event == litehtml::mouse_event::MOUSE_ENTER) {
+                m_is_hovered = true;
+            } else if (event == litehtml::mouse_event::MOUSE_LEAVE) {
+                m_is_hovered = false;
+            } else if (event == litehtml::mouse_event::MOUSE_DOWN) {
+                m_is_active = true;
+            } else if (event == litehtml::mouse_event::MOUSE_UP) {
+                m_is_active = false;
+            }
+        }
+    }
+
     void set_cursor(const char* /*cursor*/) override {}
     void transform_text(std::string& /*text*/, litehtml::text_transform /*tt*/) override {}
     void import_css(std::string& text, const std::string& /*url*/, std::string& /*baseurl*/) override {
