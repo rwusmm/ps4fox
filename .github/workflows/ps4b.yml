@@ -18,9 +18,11 @@ jobs:
 
       - name: Set up ORBIS SDK
         run: |
-          if [ ! -d "tp/openorbis" ]; then
-            git clone --depth 1 https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain.git tp/openorbis
-          fi
+          # Download pre-built release with libraries
+          wget -q https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain/releases/download/v0.5.2/OpenOrbis-PS4-Toolchain-v0.5.2-Linux.tar.xz -O /tmp/openorbis.tar.xz
+          mkdir -p tp
+          tar -xf /tmp/openorbis.tar.xz -C tp
+          mv tp/OpenOrbis-PS4-Toolchain-v0.5.2-Linux tp/openorbis
           echo "$GITHUB_WORKSPACE/tp/openorbis/bin/linux" >> $GITHUB_PATH
           echo "OO_TOOLCHAIN=$GITHUB_WORKSPACE/tp/openorbis" >> $GITHUB_ENV
 
